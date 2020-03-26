@@ -11,7 +11,7 @@ void loop() {
   currentTime = millis();
   if((currentTime - lastTime) >= period){
     states += 1;
-    lastTime = currentTime();
+    lastTime = currentTime;
   }
 
   if(states == 1){
