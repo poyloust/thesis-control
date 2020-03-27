@@ -5,7 +5,7 @@
 Adafruit_NeoPixel pixels(pixelNum, PIN, NEO_GRB + NEO_KHZ800);
 
 
-unsigned long period = 1000 * 5; // 5 sec
+unsigned long period = 1000 * 3; // 5 sec
 unsigned long currentTime;
 unsigned long lastTime = -period;
 int states = 0;
@@ -56,18 +56,22 @@ void loop() {
   if(states == 1){
     function1();
   }
-  if(states == 2){
-    function2();
+
+  else{
+    Serial.println(states);  
   }
-  if(states == 3){
-    function3();
-  }
-  if(states == 4){
-    function4();
-  }
-  if(states == 5){
-    function5();
-  }
+//  if(states == 2){
+//    function2();
+//  }
+//  if(states == 3){
+//    function3();
+//  }
+//  if(states == 4){
+//    function4();
+//  }
+//  if(states == 5){
+//    function5();
+//  }
 
 }
 
@@ -86,7 +90,7 @@ void function1(){
 
   sensorVal = analogRead(sensorPin);
   int brightness = map(sensorVal, rangeMin, rangeMax, 0, 255);
-  Serial.println(brightness);
+  //Serial.println(brightness);
   for (int i=0; i<pixelNum; i++){
     pixels.setPixelColor(i, pixels.Color(255, 101, 35));
     pixels.setBrightness(brightness);
@@ -94,18 +98,18 @@ void function1(){
   }
 }
 
-void function2(){  
-  Serial.println("run 2");
-}
-
-void function3(){
-  Serial.println("run 3");
-}
-
-void function4(){
-  Serial.println("run 4");
-}
-
-void function5(){
-  Serial.println("run 5");
-}
+//void function2(){  
+//  Serial.println("2");
+//}
+//
+//void function3(){
+//  Serial.println("3");
+//}
+//
+//void function4(){
+//  Serial.println("4");
+//}
+//
+//void function5(){
+//  Serial.println("5");
+//}
