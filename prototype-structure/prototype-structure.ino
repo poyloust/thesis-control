@@ -17,13 +17,15 @@ unsigned long currentTime;
 unsigned long lastTime = -period;
 int states = 0;
 int b1 = 3;
+int b2 = 4;
+int b3 = 5;
 int rangeMin = 0;
 int rangeMax = 60; //largest value for sound peak difference 
 int sensorPin = A0;
 int sensorValue = 0;
   
 int sampleWindow = 50; //50ms = 20Hz
-const int numReadings = 10;
+const int numReadings = 6;
 int readings[numReadings];      
 int readIndex = 0;              
 int total = 0;                  
@@ -32,9 +34,9 @@ int average = 0;
 void setup() {
   Serial.begin(9600);
 
-  pinMode(b1,INPUT);
-//  pinMode(b2,INPUT);
-//  pinMode(b3,INPUT);
+  pinMode(b1,INPUT_PULLUP);
+  pinMode(b2,INPUT_PULLUP);
+  pinMode(b3,INPUT_PULLUP);
 //  pinMode(b4,INPUT);
 //  pinMode(b5,INPUT);
 
@@ -52,21 +54,29 @@ void setup() {
 void loop() {
   
   currentTime = millis();
-  if( digitalRead(b1) == HIGH){
+  if( digitalRead(b1) == LOW){
     resetTimer();
     states = 1;
+  }
+   if( digitalRead(b2) == LOW){
+    resetTimer();
+    states = 2;
+  }
+   if( digitalRead(b3) == LOW){
+    resetTimer();
+    states = 3;
   }
   
   if((currentTime - lastTime) >= period){
     
-    if(states<6){ 
+    if(states<4){ 
       states += 1;
       
       pixels.clear();
       pixels.show();     //clear neopixel at other states
       
     }
-    if(states ==2){
+    if(states ==4){
       states = 1;
     }    
     lastTime = currentTime;
@@ -79,18 +89,6 @@ void loop() {
   else{
     Serial.println(states);  
   }
-//  if(states == 2){
-//    function2();
-//  }
-//  if(states == 3){
-//    function3();
-//  }
-//  if(states == 4){
-//    function4();
-//  }
-//  if(states == 5){
-//    function5();
-//  }
 
 }
 
@@ -99,6 +97,8 @@ void loop() {
 
 void resetTimer(){
   lastTime = currentTime;
+  pixels.clear();
+  pixels.show(); 
 }
 
 
@@ -136,7 +136,7 @@ void function1(){
 
   average = total / numReadings;
   Serial.println(average);
-  delay(1);
+  //delay(1);
 
   
   if(average > rangeMax){
@@ -153,19 +153,3 @@ void function1(){
     pixels.show(); 
   }
 }
-
-//void function2(){  
-//  Serial.println("2");
-//}
-//
-//void function3(){
-//  Serial.println("3");
-//}
-//
-//void function4(){
-//  Serial.println("4");
-//}
-//
-//void function5(){
-//  Serial.println("5");
-//}
