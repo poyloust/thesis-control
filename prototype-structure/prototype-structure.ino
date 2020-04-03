@@ -1,3 +1,6 @@
+// amplitude from MAX4466 code reference https://hester.mtholyoke.edu/idesign/SensorAmp.html
+// smoothing jumping values code from https://www.arduino.cc/en/tutorial/smoothing
+
 
 #include <Adafruit_NeoPixel.h>
 #define PIN        6
@@ -11,11 +14,16 @@ unsigned long lastTime = -period;
 int states = 0;
 int b1 = 3;
 int rangeMin = 0;
-int rangeMax = 260; //largest value for sound peak difference 
+int rangeMax = 60; //largest value for sound peak difference 
 int sensorPin = A0;
 int sensorValue = 0;
   
 int sampleWindow = 50; //50ms = 20Hz
+const int numReadings = 10;
+int readings[numReadings];      
+int readIndex = 0;              
+int total = 0;                  
+int average = 0;                
 
 int brightness = 0;
 
@@ -30,6 +38,9 @@ void setup() {
 
 
   pinMode(sensorPin, INPUT);
+  for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+    readings[thisReading] = 0;
+  }
   
   pixels.begin();
   pixels.show();
@@ -53,7 +64,7 @@ void loop() {
       pixels.show();     //clear neopixel at other states
       
     }
-    if(states ==3){
+    if(states ==2){
       states = 1;
     }    
     lastTime = currentTime;
@@ -111,15 +122,29 @@ void function1(){
 
   double peakDifference = signalMax - signalMin;
 
-  if(peakDifference > rangeMax){
-    brightness = 0;
+  total = total - readings[readIndex];
+  readings[readIndex] = peakDifference;
+  total = total + readings[readIndex];
+  readIndex = readIndex + 1;
+
+
+  if (readIndex >= numReadings) {
+    readIndex = 0;
+  }
+
+  average = total / numReadings;
+  Serial.println(average);
+  delay(1);
+  
+  if(average > rangeMax){
+    brightness = map(average,rangeMax,300,255,200);
   }
   else{
-    brightness = map(peakDifference, rangeMin, rangeMax, 255, 0);
+    brightness = map(average, rangeMin, rangeMax, 200, 0);
   }
-  Serial.println(brightness);
+  //Serial.println(brightness);
   for (int i=0; i<pixelNum; i++){
-    pixels.setPixelColor(i, pixels.Color(255, 101, 35));
+    pixels.setPixelColor(i, pixels.Color(200, 101, 35));
     pixels.setBrightness(brightness);
     pixels.show(); 
   }
