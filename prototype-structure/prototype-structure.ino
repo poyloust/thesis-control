@@ -1,12 +1,16 @@
 // amplitude from MAX4466 code reference https://hester.mtholyoke.edu/idesign/SensorAmp.html
 // smoothing jumping values code from https://www.arduino.cc/en/tutorial/smoothing
 
-
 #include <Adafruit_NeoPixel.h>
+#include <ColorConverter.h>
+
 #define PIN        6
 #define pixelNum 60
 Adafruit_NeoPixel pixels(pixelNum, PIN, NEO_GRB + NEO_KHZ800);
-
+ColorConverter converter;
+int h = 21;
+int s = 84;
+int i;
 
 unsigned long period = 1000 * 10; //  sec
 unsigned long currentTime;
@@ -24,8 +28,6 @@ int readings[numReadings];
 int readIndex = 0;              
 int total = 0;                  
 int average = 0;                
-
-int brightness = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -135,17 +137,19 @@ void function1(){
   average = total / numReadings;
   Serial.println(average);
   delay(1);
+
   
   if(average > rangeMax){
-    brightness = map(average,rangeMax,300,255,200);
+    i = map(average,rangeMax,350,20,0);
   }
   else{
-    brightness = map(average, rangeMin, rangeMax, 200, 0);
+    i = map(average, rangeMin, rangeMax, 90, 20);
   }
   //Serial.println(brightness);
-  for (int i=0; i<pixelNum; i++){
-    pixels.setPixelColor(i, pixels.Color(200, 101, 35));
-    pixels.setBrightness(brightness);
+  
+  RGBColor color = converter.HSItoRGB(h, s, i);
+  for (int j=0; j<pixelNum; j++){
+    pixels.setPixelColor(j, color.red, color.green, color.blue);
     pixels.show(); 
   }
 }
